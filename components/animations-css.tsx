@@ -52,10 +52,18 @@ export function AnimationsCSS() {
   async function afficherCarte(visible: boolean) {
     // TODO Afficher: Pour afficher rien de spécial à faire, mais assurez-vous que la classe "fade-in" est appliquée à la carte.
     // Regardez plus bas pour utiliser la propriété className directement sur l'élément!
-    
-    // TODO: Cacher: Pour cacher, il faut d'abord ajouter la classe "fade-out" à la carte, puis attendre 500ms pour que l'animation se termine avant de mettre à jour l'état
-    
-    setCardVisible(visible);
+    const elementCourant = document.getElementById(firstCardId);
+    if(visible){
+      setCardVisible(true);
+      elementCourant?.classList.add('fade-in');
+    }
+    else{
+      // TODO: Cacher: Pour cacher, il faut d'abord ajouter la classe "fade-out" à la carte, puis attendre 500ms pour que l'animation se termine avant de mettre à jour l'état
+      elementCourant?.classList.add('fade-out');
+
+      await new Promise(t => setTimeout(t, 500));//Temps d'attente avant fade-out
+      setCardVisible(visible);
+    }
   }
 
   const attackingCardsIds = ["playerCardId", "opponentCardId"];
@@ -64,11 +72,23 @@ export function AnimationsCSS() {
     // TODO: Il faut obtenir l'élément du DOM correspondant à la carte du côté spécifié 
     // Les ids utilisés sont dans l'array attackingCardsIds juste au-dessus de cette fonction.
     // Il y a deux animations possibles : "player-attack" et "opponent-attack"
+    const carte = document.getElementById(`${side}CardId`);
+    if(carte){
+      const animation = `${side}-attack`;
+      carte.classList.remove(animation);
+      void carte.offsetWidth;
+      carte.classList.add(animation);
+    }
+    
   }
   
   function activatePower() {
     // TODO: Il faut obtenir l'élément du DOM correspondant à la carte et au pouvoir sélectionnés
     // puis lui appliquer la classe "power-active" pour déclencher l'animation.
+    const elementCarte = document.getElementById(`${selectedCardId}_${selectedPowerId}`);
+    elementCarte?.classList.remove('power-active');
+    void elementCarte?.offsetHeight;
+    elementCarte?.classList.add('power-active');
   }
 
   // Il y a peu de choses à faire dans le reste du code, il y a 2 TODOs à compléter
@@ -149,7 +169,7 @@ export function AnimationsCSS() {
             <div className="demo-stage mana-stage" aria-label={`Cartes jouables avec ${mana} manas`}>
               <div className="card-row">
                 {costCards.map((card) => (
-                  <PlayingCard key={card.id} id={card.id} manaCost={card.cost} /*TODO ajouter le className pour jouer l'animation *//>
+                  <PlayingCard className={mana >= card.cost ? "card-can-be-played" : ""} key={card.id} id={card.id} manaCost={card.cost} /*TODO ajouter le className pour jouer l'animation *//>
                 ))}
               </div>
             </div>
@@ -214,6 +234,7 @@ export function AnimationsCSS() {
                     id="simple_c42"
                     powerIds={powerCards[0].powerIds}
                     // TODO: Ajouter la classe d'animation pour que la carte se retourne
+                    className="flip-scale-2-ver-right"
                   />
                 )}
               </div>
@@ -263,6 +284,7 @@ export function AnimationsCSS() {
                           id={`draw_${card.id}`}
                           powerIds={card.powerIds}
                           // TODO: Ajouter la classe d'animation pour que la carte se retourne
+                          className="flip-scale-2-ver-right slide-right"
                         />
                       );
                     }
